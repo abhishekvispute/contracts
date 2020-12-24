@@ -26,14 +26,6 @@ jobs:
     - run: npm ci
     - run: npm install -g truffle 
     - run: npm install -g ganache-cli
-# This global installation is not needed actually, we can reference local truffle  ./node_modules/.bin
-  ganache-cli:
-    needs: build
-    steps:
-      - run: cd /usr/local/lib/node_modules
-      - run: ganache-cli -s 0 -i 420 -a 30 -l 7000000
-  tests:
-    needs: ganache-cli
-    steps:
-      - run: truffle test
+    - run: ganache-cli -s 0 -i 420 -a 30 -l 7000000
+    - run: truffle test
 
