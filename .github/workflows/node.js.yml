@@ -25,7 +25,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm install -g truffle 
-    - run: truffle develop
-    - run: test
+    - run: | 
+            truffle develop
+            test
     
 
