@@ -57,6 +57,14 @@ module.exports = {
             // websockets: true
         },
 
+        CI: {
+            host: '127.0.0.1',
+            port: 8545,
+            confirmations: 0,
+            network_id: 420,
+            accounts: 21,
+            gas: 7000000
+        },
         // Useful for deploying to a public network.
         // NB: It's important to wrap the provider as a function.
         // actually we are using rinkeby not ropsten
