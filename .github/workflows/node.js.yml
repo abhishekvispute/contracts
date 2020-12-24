@@ -25,6 +25,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm install -g truffle 
+    - run: npm install -g ganache-cli
 # This global installation is not needed actually, we can reference local truffle  ./node_modules/.bin
   ganache-cli:
     needs: build
