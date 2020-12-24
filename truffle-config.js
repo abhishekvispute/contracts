@@ -57,7 +57,8 @@ module.exports = {
             // websockets: true
         },
 
-        ci: {
+        // Configuring Truffle Develop, needed for CI pipeline
+        develop: {
             host: '127.0.0.1',
             port: 8545,
             confirmations: 0,
