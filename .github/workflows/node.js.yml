@@ -31,6 +31,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - run: cd /usr/local/lib/node_modules
       - run: ganache-cli -s 0 -i 420 -a 30 -l 7000000
   tests:
     needs: ganache-cli
