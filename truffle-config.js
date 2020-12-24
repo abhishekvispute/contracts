@@ -57,7 +57,7 @@ module.exports = {
             // websockets: true
         },
 
-        CI: {
+        ci: {
             host: '127.0.0.1',
             port: 8545,
             confirmations: 0,
