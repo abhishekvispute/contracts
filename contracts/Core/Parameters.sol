@@ -119,4 +119,5 @@ contract Parameters is IParameters, ACL {
     function getStakeModifierHash() external pure override returns (bytes32) {
         return _STAKE_MODIFIER_HASH;
     }
+    function withdrawReleasePeriod() public pure returns(uint256) { return(5);}
 }
