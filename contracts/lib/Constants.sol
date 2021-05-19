@@ -11,7 +11,7 @@ library Constants {
     function penaltyNotRevealNum() public pure returns(uint256) { return (1);}
     function penaltyNotRevealDenom() public pure returns(uint256) { return (10000); }
     function minStake() public pure returns(uint256) { return(100*(10**uint256(18))); }
-    function unstakeLockPeriod() public pure returns(uint256) { return(1); }
+    function withdrawReleasePeriod() public pure returns(uint256) { return(5);}
     function withdrawLockPeriod() public pure returns(uint256) { return(1); }
     function maxAltBlocks() public pure returns(uint256) { return(5); }
     function epochLength() public pure returns(uint256) { return(40); }
