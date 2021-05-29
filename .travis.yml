@@ -10,6 +10,6 @@ before_script:
 script:
   - npm run lint
   - npm test
-  - npm coverage
-  - cat coverage/lcov.info | npx coveralls
   
+after_success:
+- npm run coveralls
