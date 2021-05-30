@@ -11,7 +11,7 @@
     "pretest": "npm run cp-ganache-env",
     "compile": "npx hardhat compile",
     "coverage": "hardhat coverage --network coverage && npm run coverage:check",
-    "coverage:check": "istanbul check-coverage --statements 93 --branches 67 --functions 87 --lines 90",
+    "coverage:check": "istanbul check-coverage --statements 90 --branches 60 --functions 80 --lines 90",
     "deploy:ganache": "./scripts/deploy.sh ganache",
     "deploy:goerli": "./scripts/deploy.sh goerli",
     "lint": "npm run cp-ganache-env && npm run lint:sol && npm run lint:js",
