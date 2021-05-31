@@ -43,6 +43,7 @@ module.exports = {
     hardhat: {
       blockGasLimit: 0x1fffffffffffff,
       chainId: 31337,
+      allowUnlimitedContractSize : true
     },
     coverage: {
       url: 'http://localhost:8555',

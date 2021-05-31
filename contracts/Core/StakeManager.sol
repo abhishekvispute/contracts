@@ -236,7 +236,7 @@ contract StakeManager is ACL, StakeStorage {
         staker.stake = staker.stake - rAmount;
         
         // Function to Reset the lock
-        resetLock(stakerId);
+        _resetLock(stakerId);
 
         // Transfer commission
         // Check commission rate >0
@@ -284,44 +284,58 @@ contract StakeManager is ACL, StakeStorage {
         uint256 stakerId = stakerIds[msg.sender];
         require(stakerId != 0, "staker id = 0");
         require(stakers[stakerId].acceptDelegation, "Delegetion not accpected");
-        // As of now we are only supporting decreasing commission update
-        // For incres one, we cant allow direct assignment becasue of unfair advantage to stakers,
-        // We will need lock system for increas update 
-        require(stakers[stakerId].commission > commission, "Invalid Commission Update");
+        require(stakers[stakerId].commission==0, "Commission already intilised");
 
         stakers[stakerId].commission = commission;
     }
 
+    function decreaseCommission(uint256 commission) external
+    {
+        uint256 stakerId = stakerIds[msg.sender];
+        require(stakerId != 0, "staker id = 0");
+        require(commission!=0,"Invalid Commission Update");
+        require(stakers[stakerId].commission > commission, "Invalid Commission Update");
+
+        stakers[stakerId].commission = commission;
+    }
     function resetLock(uint256 stakerId) public 
     {
-        Structs.Staker memory staker = stakers[stakerId];
-        require(staker.id != 0, "staker.id = 0");
+        require(stakers[stakerId].id != 0, "staker.id = 0");
+
+        Structs.Staker storage staker = stakers[stakerId];
+        StakedToken sToken = StakedToken(stakers[stakerId].tokenAddress);
+
+        uint256 penalty = 5*(10**uint256(18)); // this would be in RZR, Define it in constants
+        // 1.Constant
+        // 2.Propotonal to Stake and Epoch passed ?
+
+        // Converting Penalty into sAmount
+        uint256 sAmount = _convertParentToChild(penalty, staker.stake, sToken.totalSupply());
+
+        //Burning sAmount from msg.sender
+        require(sToken.burn(msg.sender, sAmount), "Token burn Failed");
+
+        //Updating Staker Stake
+        staker.stake = staker.stake - penalty;
+
+        //Adding it in reward pool
+        uint256 prevRewardPool = rewardPool;
+        rewardPool = rewardPool + (penalty);
+        emit RewardPoolChange(
+            stateManager.getEpoch(),
+            prevRewardPool,
+            rewardPool,
+            block.timestamp
+        );
+
+        _resetLock(stakerId);
         
-        if(msg.sender != address(this)) 
-        {
-             StakedToken sToken =  StakedToken(stakers[stakerId].tokenAddress);
-             
-             uint256 penalty = 1111; // this would be in RZR
-             // 1.Constant
-             // 2.Propotonal to Stake and Epoch passed ?
-            
-             // Converting Penalty into sAmount
-             uint256 sAmount = _convertParentToChild(penalty, staker.stake, sToken.totalSupply());
+    }  
 
-             //Burning sAmount from msg.sender
-             require(sToken.burn(msg.sender,sAmount), "Token burn Failed");
-
-             //Updating Staker Stake
-             staker.stake = staker.stake - penalty;
-
-             //Adding it in reward pool
-             uint256 prevRewardPool = rewardPool;
-             rewardPool = rewardPool+(penalty);
-             emit RewardPoolChange(stateManager.getEpoch(), prevRewardPool, rewardPool, block.timestamp);
-        
-        }
-        locks[msg.sender][staker.tokenAddress] = Structs.Lock({amount:0, withdrawAfter:0});
-    }   
+    function _resetLock(uint256 stakerId) private 
+    {
+        locks[msg.sender][stakers[stakerId].tokenAddress] = Structs.Lock({amount:0, withdrawAfter:0});
+    }
     /// @notice gives penalty to stakers for failing to reveal or
     /// reveal value deviations
     /// @param stakerId The id of staker currently in consideration
