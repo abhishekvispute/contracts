@@ -7,6 +7,7 @@ const { DEFAULT_ADMIN_ROLE_HASH, GRACE_PERIOD, WITHDRAW_LOCK_PERIOD } = require(
 const {
   assertBNEqual,
   assertBNNotEqual,
+  assertBNLessThan,
   assertRevert,
   mineToNextEpoch,
   mineToNextState,
@@ -107,6 +108,29 @@ describe('StakeManager', function () {
       assertBNEqual(staker.stake, stake2, 'Change in stake is incorrect');
       assertBNEqual(await sToken.balanceOf(staker._address), prevBalance.add(sAmount), 'Amount of minted sRzR is not correct');
     });
+    it('Staker should be able to set toggle delegation acceptance', async function(){
+      let staker = await stakeManager.getStaker(1);
+      const status = staker.acceptDelegation;
+      await stakeManager.connect(signers[1]).setDelegationAcceptance(!status);
+      staker = await stakeManager.getStaker(1);
+      assertBNEqual(staker.acceptDelegation , !status);
+    });
+
+    it('Staker should be set commission' , async function(){
+      let staker = await stakeManager.getStaker(1);
+      const comm_rate = 5;
+      await stakeManager.connect(signers[1]).setCommission(comm_rate);
+      staker = await stakeManager.getStaker(1);
+      assertBNEqual(staker.commission  , comm_rate);
+    });
+
+    it('Staker should be able decrease commission' ,async function(){
+      let staker = await stakeManager.getStaker(1);
+      const prev_comm_rate = staker.commission;
+      await stakeManager.connect(signers[1]).decreaseCommission(prev_comm_rate-1);
+      staker = await stakeManager.getStaker(1);
+      assertBNLessThan(staker.commission ,prev_comm_rate);
+    });
 
     it('Staker should be able to unstake when there is no existing lock', async function () {
       await mineToNextEpoch();
@@ -150,6 +174,9 @@ describe('StakeManager', function () {
       const sToken = await stakedToken.attach(staker.tokenAddress);
       const total_supply = await sToken.totalSupply();
       const rAmount = ((lock.amount).mul(staker.stake)).div(total_supply);
+
+      //commission deduction , although the change is evident when withdraw is done by the delegator .
+      const commission = ((rAmount).mul(staker.commission)).div(100);
 
       await mineToNextEpoch();
       epoch = await getEpoch();
@@ -199,7 +226,6 @@ describe('StakeManager', function () {
       staker = await stakeManager.getStaker(2);
       assertBNEqual(staker.stake, stake, 'Stake should not change');
     });
-
     it('should penalize staker if number of inactive epochs is greater than grace_period', async function () {
       let epoch = await getEpoch();
       const stake = tokenAmount('420000');
@@ -235,7 +261,7 @@ describe('StakeManager', function () {
       staker = await stakeManager.stakers(3);
       assertBNNotEqual(staker.stake, stake, 'Stake should have decreased due to penalty');
     });
-    
+
     it('should not penalize staker if number of inactive epochs is smaller than / equal to grace_period', async function () {
       await mineToNextEpoch();
       let epoch = await getEpoch();
