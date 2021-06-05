@@ -19,6 +19,8 @@ contract Parameters is IParameters, ACL {
     uint256 public override epochLength = 300;
     uint256 public override numStates = 4;
     uint256 public override exposureDenominator = 1000;
+    uint256 public override withdrawReleasePeriod = 5;
+    uint256 public override resetLockPenalty = 1;
 
 
     uint32 constant private _COMMIT = 0;
@@ -52,6 +54,14 @@ contract Parameters is IParameters, ACL {
 
     function setWithdrawLockPeriod(uint256 _withdrawLockPeriod) external onlyRole(DEFAULT_ADMIN_ROLE) { 
         withdrawLockPeriod = _withdrawLockPeriod;
+    }
+
+    function setWithdrawReleasePeriod(uint256 _withdrawReleasePeriod) external onlyRole(DEFAULT_ADMIN_ROLE) { 
+        withdrawReleasePeriod = _withdrawReleasePeriod;
+    }
+
+    function setResetLockPenalty(uint256 _resetLockPenalty) external onlyRole(DEFAULT_ADMIN_ROLE) { 
+        resetLockPenalty = _resetLockPenalty;
     }
 
     function setMaxAltBlocks(uint256 _maxAltBlocks) external onlyRole(DEFAULT_ADMIN_ROLE) { 
@@ -119,6 +129,5 @@ contract Parameters is IParameters, ACL {
     function getStakeModifierHash() external pure override returns (bytes32) {
         return _STAKE_MODIFIER_HASH;
     }
-    function withdrawReleasePeriod() public pure returns(uint256) { return(5);}
-    function resetLockPenalty() public pure returns(uint256) {return (1);}
+    
 }
