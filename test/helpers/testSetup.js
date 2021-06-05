@@ -48,7 +48,7 @@ const setupContracts = async () => {
   });
 
   const blockManager = await BlockManager.deploy();
-
+  const stakedToken = await ethers.getContractFactory('StakedToken');
   const delegator = await Delegator.deploy();
   const jobManager = await JobManager.deploy();
   const stakeManager = await StakeManager.deploy(BLOCK_REWARD.toHexString());
@@ -94,6 +94,7 @@ const setupContracts = async () => {
     stateManager,
     structs,
     voteManager,
+    stakedToken
   };
 };
 
